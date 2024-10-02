@@ -1,0 +1,6 @@
+name,parent,family
+Person A,,FYGS
+Person B,Person A,FYGS
+Person C,,House
+Person D,Person C,House
+Person E,Person A,FYGS
