@@ -102,6 +102,9 @@
                         style: {
                             'background-color': 'data(familyColor)',
                             'label': function(ele) {
+                                if (ele.data('pc') === 'Unknown') {
+                                    return ele.data('name') + ' (' + ele.data('family') + ')';
+                                }
                                 return ele.data('name') + ' (' + ele.data('pc') + ', ' + ele.data('family') + ')';
                             },
                             'text-valign': 'center',
