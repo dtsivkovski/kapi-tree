@@ -114,18 +114,20 @@
             const elements = [];
             const families = [];
 
+            const familiesToDisplay = ["FYGS", "Tapout", "The Forgotten House"]
+
             // push families to the list
-            for (i = 0; i < allFamilies.length - 1; i++) {
-                families.push(allFamilies[i]);
+            familiesToDisplay.forEach(function(family) {
+                families.push(family);
                 elements.push({
                     data: {
-                        id: sanitizeId(allFamilies[i]),
-                        name: allFamilies[i],
+                        id: sanitizeId(family),
+                        name: family,
                         familyHead: true,
-                        familyColor: familyColors[allFamilies[i]]
+                        familyColor: familyColors[family]
                     }
                 });
-            }
+            });
 
             data.forEach(function(person) {
                 const name = person.name;
