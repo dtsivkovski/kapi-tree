@@ -9,7 +9,7 @@ Check out the live webpage [here](https://dtsivkovski.github.io/kapi-tree/).
 ## Libraries and Tools Utilized
 
 - **Cytoscape.js**: A graph theory library for visualization and analysis.
-- **Cytoscape Dagre Layout**: A Cytoscape.js extension that uses the Dagre layout algorithm to arrange nodes in a hierarchical structure.
+- **Cytoscape Elk Layout**: A Cytoscape.js extension that uses the Elk layout algorithm to arrange nodes in a hierarchical structure.
 - **PapaParse**: A fast CSV parser to load and parse data from Google Sheets.
 - **Google Sheets**: Used as the data source to fetch chapter member information.
 
@@ -17,7 +17,7 @@ Check out the live webpage [here](https://dtsivkovski.github.io/kapi-tree/).
 
 1. **Data Source**: Data is fetched from a public Google Sheet in CSV format using **PapaParse**.
 2. **Cytoscape.js**: Nodes and edges are created based on the relationships in the data (e.g., parent-child relationships).
-3. **Dagre Layout**: The **Dagre** layout algorithm is used to arrange nodes in a hierarchical structure.
+3. **Elk Layout**: The **Elk** layout algorithm is used to arrange nodes in a hierarchical structure.
 
 ## Installation
 

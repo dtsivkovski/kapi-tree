@@ -6,19 +6,75 @@
     <title>Kapi Epsilon Chapter Tree</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cytoscape/3.30.2/cytoscape.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
-    <script src="https://unpkg.com/dagre@0.7.4/dist/dagre.js"></script>
-    <script src="https://cytoscape.org/cytoscape.js-dagre/cytoscape-dagre.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/elkjs@0.7.0/lib/elk.bundled.js"></script>
+    <script src="https://cytoscape.org/cytoscape.js-elk/cytoscape-elk.js"></script>
     <style>
         body {
             height: 100vh;
+            background-color: rgb(29, 29, 29);
+        }
+
+        /* Main cytoscape container */
+        #cy {
+            width: 100%;
+            height: 100%;
+            filter: blur(10px);  /* Initial blur to hide map until splash screen is dismissed */
+            transition: filter 0.5s ease; /* Smooth transition when blur is removed */
+        }
+
+        /* Splash screen styles */
+        #splash-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8); /* Semi-transparent black overlay */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            z-index: 9999; /* Make sure it covers everything */
+            color: white;
+            font-size: 2rem;
+            text-align: center;
+        }
+
+        /* Start button */
+        #start-button {
+            padding: 15px 30px;
+            font-size: 1.2rem;
+            background-color: #0c0a2f;
+            color: white;
+            border: none;
+            cursor: pointer;
+            margin-top: 20px;
+            border-radius: 1.5em;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+        }
+
+        #start-button:hover {
+            background-color: #000000;
+            transform: translate(0, -2px);
         }
     </style>
 </head>
 <body>
 
+    <!-- Splash screen -->
+    <div id="splash-screen">
+        <div>Welcome to the Kapi Epsilon Chapter Tree</div>
+        <button id="start-button">Start</button>
+    </div>
+
     <div id="cy" style="width: 100%; height: 100%;"></div>
 
     <script>
+        // Hide splash screen and remove blur when "Start" button is clicked
+        document.getElementById('start-button').addEventListener('click', function() {
+            document.getElementById('splash-screen').style.display = 'none'; // Hide splash screen
+            document.getElementById('cy').style.filter = 'none'; // Remove blur effect
+        });
 
         // Function to generate a random color for each family
         function generateRandomColor() {
@@ -35,7 +91,8 @@
         }
 
         // Map to store family colors
-        const familyColors = {"FYGS": "#fc6b03", "Tapout": "#8ec6fa", "House":"#c07cf7", "Camp": "#83bd7b"};
+        const allFamilies = ["FYGS", "Tapout", "House", "The Forgotten House", "Camp"];
+        const familyColors = {"FYGS": "#fc6b03", "Tapout": "#2b75ed", "House":"#c663ff", "Camp": "#1ad630", "The Forgotten House": "#bd020b"};
 
         // Function to fetch and parse CSV file
         function loadCSV() {
@@ -55,16 +112,31 @@
         // Function to process the CSV data and generate the Cytoscape elements
         function processData(data) {
             const elements = [];
+            const families = [];
+
+            // push families to the list
+            for (i = 0; i < allFamilies.length - 1; i++) {
+                families.push(allFamilies[i]);
+                elements.push({
+                    data: {
+                        id: sanitizeId(allFamilies[i]),
+                        name: allFamilies[i],
+                        familyHead: true,
+                        familyColor: familyColors[allFamilies[i]]
+                    }
+                });
+            }
 
             data.forEach(function(person) {
                 const name = person.name;
                 const parent = person.parent || 'Unknown';
                 const family = person.family || 'Unknown';
                 const pc = person.pc || 'Unknown';
-
+                const additional = person.additional || 'Unknown';
 
                 const sanitizedName = sanitizeId(name);
                 const sanitizedParent = sanitizeId(parent);
+                const sanitizedFamily = sanitizeId(family);
 
                 // Assign a color to the family if not already assigned
                 if (!familyColors[family]) {
@@ -87,6 +159,15 @@
                     elements.push({
                         data: { source: sanitizedParent, target: sanitizedName }
                     });
+                } else {
+                    elements.push({
+                        data: { source: sanitizedFamily, target: sanitizedName }
+                    });
+                }
+                if (additional !== 'Unknown') {
+                    elements.push({
+                        data: { source: additional, target: sanitizedName }
+                    })
                 }
             });
 
@@ -102,6 +183,9 @@
                         style: {
                             'background-color': 'data(familyColor)',
                             'label': function(ele) {
+                                if (ele.data('familyHead') == true) {
+                                    return ele.data('name');
+                                }
                                 if (ele.data('pc') === 'Unknown') {
                                     return ele.data('name') + ' (' + ele.data('family') + ')';
                                 }
@@ -112,6 +196,7 @@
                             'border-width': 0,
                             'border-color': '#000',
                             'font-size': '10vw',
+                            'color': '#fff',
                         }
                     },
                     {
@@ -125,11 +210,18 @@
                     }
                 ],
                 layout: {
-                    name: 'dagre',
-                    rankDir: 'TB',  // Top to bottom
-                    nodeSep: 150,    // Horizontal spacing
-                    rankSep: 50,
-                    animate: true,
+                    name: 'elk',
+                    fit: true,
+                    ranker: 'longest-path',
+                    animate: false,
+                    animationDuration: 300,
+                    animationEasing: 'ease-in-out-cubic',
+                    spacingFactor: 3.75,
+                    elk: {
+                        zoomToFit: true,
+                        algorithm: 'mrtree',
+                        separateConnectedComponents: false,
+                    },
                 }
             });
         }
