@@ -1,6 +1,6 @@
 # kapi-tree
 
-kapi-tree is a web-based visualization tool that uses the **Cytoscape.js** library to display the hierarchical structure of Kappa Alpha Pi Epsilon Chapter's family trees. It parses data from a Google Sheets CSV and arranges nodes based on pledge class and family lineage.
+kapi-tree is a web-based visualization tool that uses the **Cytoscape.js** library to display the hierarchical structure of a family trees of an organization. It parses data from a Google Sheets CSV and arranges nodes based on pledge class and family lineage.
 
 ## Live Webpage
 
