@@ -88,7 +88,7 @@
         }
 
         function sanitizeId(name) {
-            return name.replace(/[^a-zA-Z0-9]/g, '_'); // Replace non-alphanumeric characters with underscores
+            return name.toLowerCase().replace(/[^a-z0-9]/g, '_'); // Convert to lowercase and replace non-alphanumeric characters with underscores
         }
 
         // Map to store family colors
@@ -114,6 +114,7 @@
         function processData(data) {
             const elements = [];
             const families = [];
+            const edges = []; // Store edges separately
 
             const familiesToDisplay = ["FYGS", "Tapout", "The Forgotten House"]
 
@@ -130,16 +131,13 @@
                 });
             });
 
+            // First pass: Create all person nodes
             data.forEach(function(person) {
                 const name = person.name;
-                const parent = person.parent || 'Unknown';
                 const family = person.family || 'Unknown';
                 const pc = person.pc || 'Unknown';
-                const additional = person.additional || 'Unknown';
 
                 const sanitizedName = sanitizeId(name);
-                const sanitizedParent = sanitizeId(parent);
-                const sanitizedFamily = sanitizeId(family);
 
                 // Assign a color to the family if not already assigned
                 if (!familyColors[family]) {
@@ -156,6 +154,18 @@
                         familyColor: familyColors[family]
                     }
                 });
+            });
+
+            // Second pass: Create all edges after all nodes exist
+            data.forEach(function(person) {
+                const name = person.name;
+                const parent = person.parent || 'Unknown';
+                const family = person.family || 'Unknown';
+                const additional = person.additional || 'Unknown';
+
+                const sanitizedName = sanitizeId(name);
+                const sanitizedParent = sanitizeId(parent);
+                const sanitizedFamily = sanitizeId(family);
 
                 // Create an edge from parent to child if the parent exists
                 if (parent !== 'Unknown') {
@@ -169,7 +179,7 @@
                 }
                 if (additional !== 'Unknown') {
                     elements.push({
-                        data: { source: additional, target: sanitizedName }
+                        data: { source: sanitizeId(additional), target: sanitizedName }
                     })
                 }
             });
